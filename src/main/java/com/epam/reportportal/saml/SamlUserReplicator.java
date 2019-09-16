@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.epam.reportportal.config.TestPlugin.DemoPluginImpl.EMPTY_STRING;
-import static com.epam.reportportal.config.TestPlugin.DemoPluginImpl.SAML_PLUGIN_NAME;
+import static com.epam.reportportal.config.SamlPlugin.SamlExtension.EMPTY_STRING;
+import static com.epam.reportportal.config.SamlPlugin.SamlExtension.SAML_PLUGIN_NAME;
 import static com.epam.ta.reportportal.commons.EntityUtils.normalizeId;
 import static java.util.Optional.ofNullable;
 

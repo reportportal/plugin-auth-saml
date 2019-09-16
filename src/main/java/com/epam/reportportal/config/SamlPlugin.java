@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 EPAM Systems
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.epam.reportportal.config;
 
 import com.epam.reportportal.extension.PluginCommand;
@@ -91,7 +106,7 @@ import static org.springframework.web.servlet.support.ServletUriComponentsBuilde
 /**
  * @author <a href="mailto:ivan_budayeu@epam.com">Ivan Budayeu</a>
  */
-public class TestPlugin extends Plugin {
+public class SamlPlugin extends Plugin {
 	/**
 	 * Constructor to be used by plugin manager for plugin instantiation.
 	 * Your plugins have to provide constructor with this exact signature to
@@ -99,7 +114,7 @@ public class TestPlugin extends Plugin {
 	 *
 	 * @param wrapper
 	 */
-	public TestPlugin(PluginWrapper wrapper) {
+	public SamlPlugin(PluginWrapper wrapper) {
 		super(wrapper);
 	}
 
@@ -115,7 +130,7 @@ public class TestPlugin extends Plugin {
 
 	@Extension(ordinal = 1)
 	@Component
-	public static class DemoPluginImpl extends SamlServiceProviderServerBeanConfiguration implements AuthExtension, DisposableBean {
+	public static class SamlExtension extends SamlServiceProviderServerBeanConfiguration implements AuthExtension, DisposableBean {
 
 		public static final String SAML_PLUGIN_NAME = "saml";
 		public static final String EMPTY_STRING = "";
@@ -170,7 +185,7 @@ public class TestPlugin extends Plugin {
 
 		private Boolean signedRequests = true;
 
-		public DemoPluginImpl(Map<String, Object> initParams) {
+		public SamlExtension(Map<String, Object> initParams) {
 			keyStore = "file://" + IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).orElse(EMPTY_STRING) + keyStore;
 			SamlPluginProperties.BASE_PATH.getParam(initParams).ifPresent(basePath -> this.basePath = basePath);
 			SamlPluginProperties.KEY_ALIAS.getParam(initParams).ifPresent(keyAlias -> this.keyAlias = keyAlias);
