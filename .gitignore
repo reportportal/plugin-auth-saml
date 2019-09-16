@@ -1,0 +1,6 @@
+.gradle/
+.idea/
+out/
+plugins/saml-plugin.jar
+velocity.log
+velocity.log.1
