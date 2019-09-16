@@ -17,9 +17,9 @@ package com.epam.reportportal.config;
 
 import com.epam.reportportal.extension.PluginCommand;
 import com.epam.reportportal.extension.auth.AuthExtension;
-import com.epam.reportportal.extension.auth.AuthProviderInfo;
-import com.epam.reportportal.extension.auth.CompositeInfoContributor;
 import com.epam.reportportal.extension.auth.data.BeanProviderData;
+import com.epam.reportportal.extension.auth.info.AuthProviderInfo;
+import com.epam.reportportal.extension.auth.info.CompositeInfoContributor;
 import com.epam.reportportal.extension.common.IntegrationTypeProperties;
 import com.epam.reportportal.extension.event.IntegrationEvent;
 import com.epam.reportportal.properties.SamlIntegrationProperties;

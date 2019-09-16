@@ -17,9 +17,9 @@ package com.epam.reportportal.config;
 
 import com.epam.reportportal.config.handler.SamlAuthFailureHandler;
 import com.epam.reportportal.config.handler.SamlAuthSuccessHandler;
-import com.epam.reportportal.extension.auth.BeanProvider;
 import com.epam.reportportal.extension.auth.TokenServicesFacade;
 import com.epam.reportportal.extension.auth.data.BeanData;
+import com.epam.reportportal.extension.auth.provider.BeanProvider;
 import com.epam.reportportal.saml.SamlUserReplicator;
 import com.epam.ta.reportportal.binary.UserDataStoreService;
 import com.epam.ta.reportportal.dao.IntegrationRepository;
