@@ -139,34 +139,6 @@ public class SamlPlugin extends Plugin {
 		private static final Integer DEFAULT_NETWORK_CONNECT_TIMEOUT = 5000;
 		private static final Integer DEFAULT_NETWORK_READ_TIMEOUT = 10000;
 
-		@Override
-		public List<BeanProviderData> getBeanProviders() {
-			return Lists.newArrayList(new BeanProviderData("samlConfig", SamlConfig.class));
-		}
-
-		@Override
-		public List<String> getCommandNames() {
-			return Collections.emptyList();
-		}
-
-		@Override
-		public PluginCommand getCommandToExecute(String commandName) {
-			return (integration, params) -> EMPTY_STRING;
-		}
-
-		@Override
-		public void destroy() {
-			ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
-					ApplicationEventMulticaster.class
-			);
-			applicationEventMulticaster.removeApplicationListener(samlProviderReloadListener);
-
-			FilterChainProxy filterChainProxy = (FilterChainProxy) springSecurityFilterChain;
-			List<Filter> filters = filterChainProxy.getFilters("/");
-			filters.removeIf(f -> SamlCompositeFilter.class.isAssignableFrom(f.getClass()));
-			compositeInfoContributor.getReportPortalInfoContributors().remove(SAML_PLUGIN_NAME);
-		}
-
 		private String basePath = "http://localhost:9999";
 
 		private String keyAlias = "report-portal-sp";
@@ -184,28 +156,6 @@ public class SamlPlugin extends Plugin {
 		private Integer networkReadTimeout = DEFAULT_NETWORK_READ_TIMEOUT;
 
 		private Boolean signedRequests = true;
-
-		public SamlExtension(Map<String, Object> initParams) {
-			keyStore = "file://" + IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).orElse(EMPTY_STRING) + keyStore;
-			SamlPluginProperties.BASE_PATH.getParam(initParams).ifPresent(basePath -> this.basePath = basePath);
-			SamlPluginProperties.KEY_ALIAS.getParam(initParams).ifPresent(keyAlias -> this.keyAlias = keyAlias);
-			SamlPluginProperties.KEY_PASSWORD.getParam(initParams).ifPresent(keyPassword -> this.keyPassword = keyPassword);
-			SamlPluginProperties.KEY_STORE.getParam(initParams).ifPresent(keyStore -> this.keyStore = keyPassword);
-			SamlPluginProperties.KEY_STORE_PASSWORD.getParam(initParams)
-					.ifPresent(keyStorePassword -> this.keyStorePassword = keyStorePassword);
-			SamlPluginProperties.ACTIVE_KEY_NAME.getParam(initParams).ifPresent(activeKeyName -> this.activeKeyName = activeKeyName);
-			SamlPluginProperties.NETWORK_CONNECTION_TIMEOUT.getParam(initParams)
-					.ifPresent(networkConnectTimeout -> this.networkConnectTimeout = NumberUtils.toInt(networkConnectTimeout,
-							DEFAULT_NETWORK_CONNECT_TIMEOUT
-					));
-			SamlPluginProperties.NETWORK_READ_TIMEOUT.getParam(initParams)
-					.ifPresent(networkReadTimeout -> this.networkReadTimeout = NumberUtils.toInt(networkReadTimeout,
-							DEFAULT_NETWORK_READ_TIMEOUT
-					));
-			SamlPluginProperties.SIGNED_REQUESTS.getParam(initParams)
-					.ifPresent(signedRequests -> this.signedRequests = BooleanUtils.toBoolean(signedRequests));
-
-		}
 
 		@Autowired
 		private ApplicationContext applicationContext;
@@ -259,6 +209,36 @@ public class SamlPlugin extends Plugin {
 			return implementation;
 		});
 
+		public SamlExtension(Map<String, Object> initParams) {
+			keyStore = "file://" + IntegrationTypeProperties.RESOURCES_DIRECTORY.getValue(initParams).orElse(EMPTY_STRING) + keyStore;
+			SamlPluginProperties.BASE_PATH.getParam(initParams).ifPresent(basePath -> this.basePath = basePath);
+			SamlPluginProperties.KEY_ALIAS.getParam(initParams).ifPresent(keyAlias -> this.keyAlias = keyAlias);
+			SamlPluginProperties.KEY_PASSWORD.getParam(initParams).ifPresent(keyPassword -> this.keyPassword = keyPassword);
+			SamlPluginProperties.KEY_STORE.getParam(initParams).ifPresent(keyStore -> this.keyStore = keyPassword);
+			SamlPluginProperties.KEY_STORE_PASSWORD.getParam(initParams)
+					.ifPresent(keyStorePassword -> this.keyStorePassword = keyStorePassword);
+			SamlPluginProperties.ACTIVE_KEY_NAME.getParam(initParams).ifPresent(activeKeyName -> this.activeKeyName = activeKeyName);
+			SamlPluginProperties.NETWORK_CONNECTION_TIMEOUT.getParam(initParams)
+					.ifPresent(networkConnectTimeout -> this.networkConnectTimeout = NumberUtils.toInt(networkConnectTimeout,
+							DEFAULT_NETWORK_CONNECT_TIMEOUT
+					));
+			SamlPluginProperties.NETWORK_READ_TIMEOUT.getParam(initParams)
+					.ifPresent(networkReadTimeout -> this.networkReadTimeout = NumberUtils.toInt(networkReadTimeout,
+							DEFAULT_NETWORK_READ_TIMEOUT
+					));
+			SamlPluginProperties.SIGNED_REQUESTS.getParam(initParams)
+					.ifPresent(signedRequests -> this.signedRequests = BooleanUtils.toBoolean(signedRequests));
+
+		}
+
+		@PostConstruct
+		public void init() {
+			initBasePath();
+			initIntegrationEventListener();
+			initFilterChain();
+			initInfoContributor();
+		}
+
 		private class SamlProvidersReloadEventHandler implements ApplicationListener<IntegrationEvent> {
 
 			@Override
@@ -280,8 +260,31 @@ public class SamlPlugin extends Plugin {
 		}
 
 		@Override
-		protected SamlServerConfiguration getDefaultHostSamlServerConfiguration() {
-			return samlServerConfigurationSupplier.get();
+		public List<BeanProviderData> getBeanProviders() {
+			return Lists.newArrayList(new BeanProviderData("samlConfig", SamlConfig.class));
+		}
+
+		@Override
+		public List<String> getCommandNames() {
+			return Collections.emptyList();
+		}
+
+		@Override
+		public PluginCommand getCommandToExecute(String commandName) {
+			return (integration, params) -> EMPTY_STRING;
+		}
+
+		@Override
+		public void destroy() {
+			ApplicationEventMulticaster applicationEventMulticaster = applicationContext.getBean(AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
+					ApplicationEventMulticaster.class
+			);
+			applicationEventMulticaster.removeApplicationListener(samlProviderReloadListener);
+
+			FilterChainProxy filterChainProxy = (FilterChainProxy) springSecurityFilterChain;
+			List<Filter> filters = filterChainProxy.getFilters("/");
+			filters.removeIf(f -> SamlCompositeFilter.class.isAssignableFrom(f.getClass()));
+			compositeInfoContributor.getReportPortalInfoContributors().remove(SAML_PLUGIN_NAME);
 		}
 
 		@Override
@@ -308,6 +311,11 @@ public class SamlPlugin extends Plugin {
 					.setPrefix("saml/sp")
 					.setBasePath(basePath);
 			return serviceProviderConfiguration;
+		}
+
+		@Override
+		protected SamlServerConfiguration getDefaultHostSamlServerConfiguration() {
+			return samlServerConfigurationSupplier.get();
 		}
 
 		private NetworkConfiguration networkConfiguration() {
@@ -382,14 +390,6 @@ public class SamlPlugin extends Plugin {
 			};
 		}
 
-		@PostConstruct
-		public void init() {
-			initBasePath();
-			initIntegrationEventListener();
-			initFilterChain();
-			initInfoContributor();
-		}
-
 		private void initBasePath() {
 			IntegrationType integrationType = integrationTypeRepository.findByName(SAML_PLUGIN_NAME)
 					.orElseThrow(() -> new ReportPortalException(ErrorType.UNABLE_INTERACT_WITH_INTEGRATION, "SAML plugin was not found"));
@@ -438,7 +438,6 @@ public class SamlPlugin extends Plugin {
 		private void initInfoContributor() {
 			ofNullable(httpServletRequest.get()).ifPresent(request -> {
 				compositeInfoContributor.addInfoContributor(SAML_PLUGIN_NAME, builder -> {
-
 					Map<String, String> samlProviders = integrationTypeRepository.findByName(SAML_PLUGIN_NAME)
 							.map(integrationType -> integrationRepository.findAllGlobalByType(integrationType)
 									.stream()

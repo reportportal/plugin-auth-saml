@@ -65,10 +65,8 @@ public class CertificationUtil {
 			password = jksPassword.toCharArray();
 		}
 		if (jksPath.startsWith("file://")) {
-			System.err.println("LOADED");
 			keyStore.load(Files.newInputStream(Paths.get(jksPath.replaceFirst("file://", ""))), password);
 		} else {
-			System.err.println("NOT LOADED");
 			keyStore.load(ClassLoader.getSystemResourceAsStream(jksPath), password);
 		}
 	}
