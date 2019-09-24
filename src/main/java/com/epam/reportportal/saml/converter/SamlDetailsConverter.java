@@ -17,8 +17,6 @@ package com.epam.reportportal.saml.converter;
 
 import com.epam.reportportal.properties.SamlIntegrationProperties;
 import com.epam.ta.reportportal.entity.integration.Integration;
-import com.epam.ta.reportportal.entity.saml.SamlProviderDetails;
-import com.epam.ta.reportportal.ws.model.integration.auth.SamlDetailsResource;
 import org.springframework.security.saml.provider.service.config.ExternalIdentityProviderConfiguration;
 import org.springframework.security.saml.saml2.metadata.NameId;
 
@@ -36,36 +34,6 @@ import static java.util.Optional.ofNullable;
  * @author Yevgeniy Svalukhin
  */
 public class SamlDetailsConverter {
-
-	public final static Function<SamlProviderDetails, SamlDetailsResource> TO_RESOURCE = details -> {
-		SamlDetailsResource resource = new SamlDetailsResource();
-		resource.setId(details.getId());
-		resource.setEmailAttribute(details.getEmailAttributeId());
-		resource.setFirstNameAttribute(details.getFirstNameAttributeId());
-		resource.setLastNameAttribute(details.getLastNameAttributeId());
-		resource.setFullNameAttribute(details.getFullNameAttributeId());
-		resource.setIdentityProviderAlias(details.getIdpAlias());
-		resource.setIdentityProviderMetadataUrl(details.getIdpMetadata());
-		resource.setIdentityProviderName(details.getIdpName());
-		resource.setIdentityProviderUrl(details.getIdpUrl());
-		resource.setEnabled(details.isEnabled());
-		return resource;
-	};
-
-	public final static Function<SamlDetailsResource, SamlProviderDetails> FROM_RESOURCE = resource -> {
-		SamlProviderDetails entity = new SamlProviderDetails();
-
-		entity.setEmailAttributeId(resource.getEmailAttribute());
-		entity.setFirstNameAttributeId(resource.getFirstNameAttribute());
-		entity.setLastNameAttributeId(resource.getLastNameAttribute());
-		entity.setFullNameAttributeId(resource.getFullNameAttribute());
-		entity.setIdpAlias(resource.getIdentityProviderAlias());
-		entity.setIdpMetadata(resource.getIdentityProviderMetadataUrl());
-		entity.setIdpName(resource.getIdentityProviderName());
-		entity.setIdpUrl(resource.getIdentityProviderUrl());
-		entity.setEnabled(resource.isEnabled());
-		return entity;
-	};
 
 	public final static Function<List<Integration>, List<ExternalIdentityProviderConfiguration>> TO_EXTERNAL_PROVIDER_CONFIG = providers -> {
 		List<ExternalIdentityProviderConfiguration> externalProviders = providers.stream()
